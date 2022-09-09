@@ -179,7 +179,7 @@ public class Racer implements Comparable<Racer> {
                     g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[2][0], (int)previousRaycasts[2][1]);
                 }
                 else {
-                    g.drawLine((int)centerX, (int)centerY, (int)(centerX + doubleApothem * Math.cos(velocityDirection)), (int)(centerY + doubleApothem * Math.sin(velocityDirection)));
+                    g.drawLine((int)centerX, (int)centerY, (int)(centerX + doubleApothem * 2 * Math.cos(velocityDirection)), (int)(centerY + doubleApothem * 2 * Math.sin(velocityDirection)));
                 }
             }
         }
