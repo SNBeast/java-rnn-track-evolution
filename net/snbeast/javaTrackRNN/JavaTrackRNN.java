@@ -196,16 +196,23 @@ public class JavaTrackRNN extends JPanel implements ActionListener, KeyListener 
         String mapPack = "";
         for (String st : args) {
             if (st.equals("-?") || st.equals("-h") || st.equals("--help")) {
-                System.out.println("Usage: JavaTrackRNN [--braindump=brainfile] [--mappack=pack.zip]");
+                System.out.println("Usage: JavaTrackRNN [--braindump=brainfile] [--mappack=pack.zip] [--debug[-ai]]");
                 System.out.println("If there is no map pack specified, \"default.zip\" will be used.");
                 System.out.println("Press \"d\" while running to make a brain dump of the best player.");
+                System.out.println("--debug opens map debug mode, --debug-ai opens AI debug mode");
                 System.exit(0);
             }
-            if (st.startsWith("--braindump=")) {
+            else if (st.startsWith("--braindump=")) {
                 brainDump = st.replaceFirst("--braindump=", "");
             }
-            if (st.startsWith("--mappack=")) {
+            else if (st.startsWith("--mappack=")) {
                 mapPack = st.replaceFirst("--mappack=", "");
+            }
+            else if (st.startsWith("--debug")) {
+                DEBUG = true;
+                if (st.equals("--debug-ai")) {
+                    DEBUG_AI = true;
+                }
             }
         }
         Map mapArg;
