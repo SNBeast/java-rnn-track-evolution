@@ -76,11 +76,13 @@ public class MapMaker extends JPanel implements KeyListener, MouseInputListener 
                 break;
         }
         switch (state) {
+            default:
+                g.drawLine(startX, startY, (int)(startX + Racer.doubleApothem * 2 * Math.cos(startDirection)), (int)(startY + Racer.doubleApothem * 2 * Math.sin(startDirection)));
+            case DirectionInit:
+                g.fillRect(startX - Racer.apothem, startY - Racer.apothem, Racer.doubleApothem, Racer.doubleApothem);
+                break;
             case OOBColor:
             case PositionInit:
-                break;
-            default:
-                g.fillRect(startX - Racer.apothem, startY - Racer.apothem, Racer.doubleApothem, Racer.doubleApothem);
                 break;
         }
     }
