@@ -30,14 +30,16 @@ public class JavaTrackRNN extends JPanel implements ActionListener, KeyListener 
         this.map = map;
         if (DEBUG) {
             racer = new Racer(seedBrain == null ? new Brain(seedBrain) : seedBrain, map);
-            bw = new BrainWindow(racer.getBrain());
-            brainCanvas.add(bw);
-            brainFrame.addKeyListener(this);
-            brainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            brainFrame.setResizable(false);
-            brainFrame.setLocationRelativeTo(null);
-            brainFrame.pack();
-            brainFrame.setVisible(true);
+            if (DEBUG_AI) {
+                bw = new BrainWindow(racer.getBrain());
+                brainCanvas.add(bw);
+                brainFrame.addKeyListener(this);
+                brainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                brainFrame.setResizable(false);
+                brainFrame.setLocationRelativeTo(null);
+                brainFrame.pack();
+                brainFrame.setVisible(true);
+            }
         }
         else {
             generation = new Generation(seedBrain, map);
@@ -59,8 +61,16 @@ public class JavaTrackRNN extends JPanel implements ActionListener, KeyListener 
         super.paintComponent(g);
         g.drawImage(map.getImage(), 0, 0, null);
         if (DEBUG) {
-            g.setColor(Color.RED);
-            for (Checkpoint c : map.getCheckpoints()) {
+            Checkpoint[] checkpoints = map.getCheckpoints();
+            for (int i = 0; i < checkpoints.length; i++) {
+                Checkpoint c = checkpoints[i];
+                long score = racer.getScore();
+                if (i == Math.floorMod(score, checkpoints.length) || i == Math.floorMod(score + 1, checkpoints.length)) {
+                    g.setColor(Color.BLUE);
+                }
+                else {
+                    g.setColor(Color.RED);
+                }
                 g.drawLine(c.x1(), c.y1(), c.x2(), c.y2());
             }
             g.setColor(Color.BLUE);
@@ -109,10 +119,12 @@ public class JavaTrackRNN extends JPanel implements ActionListener, KeyListener 
         if (DEBUG) {
             if (e.getKeyChar() == 'r') {
                 racer = new Racer(new Brain(null), map);
-                brainCanvas.remove(bw);
-                brainCanvas.revalidate();
-                bw = new BrainWindow(racer.getBrain());
-                brainCanvas.add(bw);
+                if (DEBUG_AI) {
+                    brainCanvas.remove(bw);
+                    brainCanvas.revalidate();
+                    bw = new BrainWindow(racer.getBrain());
+                    brainCanvas.add(bw);
+                }
             }
         }
         else {

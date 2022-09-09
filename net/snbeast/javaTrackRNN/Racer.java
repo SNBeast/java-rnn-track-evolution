@@ -44,8 +44,7 @@ public class Racer implements Comparable<Racer> {
         previousRaycasts[0] = new double[]{centerX, centerY};
         previousRaycasts[1] = new double[]{centerX, centerY};
         previousRaycasts[2] = new double[]{centerX, centerY};
-        velocityDirection = map.getInitialDirection();
-        accelerationDirection = velocityDirection;
+        velocityDirection = accelerationDirection = map.getInitialDirection();
     }
     public void move () {
         if (!dead) {
@@ -173,10 +172,15 @@ public class Racer implements Comparable<Racer> {
     public void draw (Graphics g) {
         if (!dead) {
             g.fillRect((int)centerX - apothem, (int)centerY - apothem, doubleApothem, doubleApothem);
-            if (JavaTrackRNN.DEBUG && JavaTrackRNN.DEBUG_AI) {
-                g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[0][0], (int)previousRaycasts[0][1]);
-                g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[1][0], (int)previousRaycasts[1][1]);
-                g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[2][0], (int)previousRaycasts[2][1]);
+            if (JavaTrackRNN.DEBUG) {
+                if (JavaTrackRNN.DEBUG_AI) {
+                    g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[0][0], (int)previousRaycasts[0][1]);
+                    g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[1][0], (int)previousRaycasts[1][1]);
+                    g.drawLine((int)centerX, (int)centerY, (int)previousRaycasts[2][0], (int)previousRaycasts[2][1]);
+                }
+                else {
+                    g.drawLine((int)centerX, (int)centerY, (int)(centerX + doubleApothem * Math.cos(velocityDirection)), (int)(centerY + doubleApothem * Math.sin(velocityDirection)));
+                }
             }
         }
     }

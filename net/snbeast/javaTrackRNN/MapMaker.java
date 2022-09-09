@@ -35,6 +35,9 @@ public class MapMaker extends JPanel implements KeyListener, MouseInputListener 
     private int y1;
     private int x2;
     private int y2;
+    private boolean shownFIfDone = false;
+    private boolean shownSecondCheckpointPoint = false;
+
     private MapMaker (BufferedImage image, File pack) {
         this.image = image;
         this.pack = pack;
@@ -106,12 +109,18 @@ public class MapMaker extends JPanel implements KeyListener, MouseInputListener 
             case CheckpointFirstPoint:
                 x1 = x2 = e.getX();
                 y1 = y2 = e.getY();
-                JOptionPane.showMessageDialog(null, "Click to set the checkpoint's second point.");
+                if (!shownSecondCheckpointPoint) {
+                    JOptionPane.showMessageDialog(null, "Click to set the checkpoint's second point.");
+                    shownSecondCheckpointPoint = true;
+                }
                 state = MapMakerState.CheckpointSecondPoint;
                 break;
             case CheckpointSecondPoint:
                 checkpointList.add(new Checkpoint(x1, y1, x2, y2));
-                JOptionPane.showMessageDialog(null, "Click to set another checkpoint's first point, or type \"f\" if done.");
+                if (!shownFIfDone) {
+                    JOptionPane.showMessageDialog(null, "Click to set another checkpoint's first point, or type \"f\" if done.");
+                    shownFIfDone = true;
+                }
                 state = MapMakerState.CheckpointFirstPoint;
                 repaint();
                 break;
