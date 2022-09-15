@@ -67,16 +67,14 @@ public class Brain implements Serializable {
         }
     }
 
-    public double[] getOutputs (double[] inputs) {
+    public void getOutputs (double[] inputs, double[] outputs) {
         for (int i = 0; i < inputNodeCount; i++) {
             inputNodes[i].setInput(inputs[i]);
         }
-        double[] outputs = new double[outputNodeCount];
         for (int i = 0; i < outputNodeCount; i++) {
             outputs[i] = outputNodes[i].getOutput();
         }
         currentCycle ^= true;
-        return outputs;
     }
 
     private double getMutatedConnectionStrengthFromBrain (Brain brainToInheritFrom, int layerAfterInput, int layerMember, int connection) {

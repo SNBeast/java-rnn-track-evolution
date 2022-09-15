@@ -25,14 +25,16 @@ public class Node implements Serializable {
         if (lastCycleProcessed == brain.getCurrentCycle()) {
             return output;
         }
-        lastCycleProcessed = brain.getCurrentCycle();
+        lastCycleProcessed ^= true;
         return processOutput();
     }
     private double processOutput () {
         if (inputConnections == null) {
             output = input;
-            if (output < 0) color = new Color(0, 0, -(float)output);
-            else color = new Color((float)output, 0, 0);
+            if (JavaTrackRNN.DEBUG_AI) {
+                if (output < 0) color = new Color(0, 0, -(float)output);
+                else color = new Color((float)output, 0, 0);
+            }
             return output;
         }
         double out = 0;
@@ -40,8 +42,10 @@ public class Node implements Serializable {
             out += inputConnections[i].getOutput();
         }
         output = Utils.sigmoid(out);
-        if (output < 0) color = new Color(0, 0, -(float)output);
-        else color = new Color((float)output, 0, 0);
+        if (JavaTrackRNN.DEBUG_AI) {
+            if (output < 0) color = new Color(0, 0, -(float)output);
+            else color = new Color((float)output, 0, 0);
+        }
         return output;
     }
 

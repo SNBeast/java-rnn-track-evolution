@@ -12,39 +12,48 @@ public class Racer implements Comparable<Racer> {
     private static final int initialLimit = 300;
     private static final int maxClock = 900;
 
-    private final Brain brain;
     private final Map map;
     private final double mapHypot;
+    private Brain brain;
     private double centerX;
     private double centerY;
-    private double velocityMagnitude = 0;
+    private double velocityMagnitude;
     private double velocityDirection;
     private double accelerationDirection;
-    private double accelerationDirectionVelocity = 0;
+    private double accelerationDirectionVelocity;
 
-    private double velocityX = 0;
-    private double velocityY = 0;
+    private double velocityX;
+    private double velocityY;
 
-    private double[][] previousRaycasts = new double[3][];
+    private double[][] previousRaycasts = new double[3][2];
     private double[] previousBrainOutput = new double[Brain.outputNodeCount];
+    private double[] brainInputs = new double[Brain.inputNodeCount];
 
-    private boolean dead = false;
-    private boolean touchingCheckpointLastFrame = false;
-    private long score = 0;
-    private int clock = 0;
-    private int clockMax = initialLimit;
-    private boolean preventImmortality = true;
+    private boolean dead;
+    private boolean touchingCheckpointLastFrame;
+    private long score;
+    private int clock;
+    private int clockMax;
+    private boolean preventImmortality;
 
     public Racer (Brain brain, Map map) {
-        this.brain = brain;
         this.map = map;
         mapHypot = Math.hypot(map.getImage().getWidth(), map.getImage().getHeight());
-        centerX = map.getInitialX();
-        centerY = map.getInitialY();
-        previousRaycasts[0] = new double[]{centerX, centerY};
-        previousRaycasts[1] = new double[]{centerX, centerY};
-        previousRaycasts[2] = new double[]{centerX, centerY};
+        initialize(brain);
+    }
+    public void initialize () {
+        previousRaycasts[0][0] = previousRaycasts[1][0] = previousRaycasts[2][0] = centerX = map.getInitialX();
+        previousRaycasts[0][1] = previousRaycasts[1][1] = previousRaycasts[2][1] = centerY = map.getInitialY();
         velocityDirection = accelerationDirection = map.getInitialDirection();
+        velocityMagnitude = accelerationDirectionVelocity = velocityX = velocityY = clock = 0;
+        score = 0;
+        dead = touchingCheckpointLastFrame = false;
+        clockMax = initialLimit;
+        preventImmortality = true;
+    }
+    public void initialize (Brain brain) {
+        this.brain = brain;
+        initialize();
     }
     public void move () {
         if (!dead) {
@@ -135,30 +144,29 @@ public class Racer implements Comparable<Racer> {
     }
     public void runBrain () {
         if (!dead) {
-            previousRaycasts[0] = castRay(accelerationDirection - raycastAngleOffset);
-            previousRaycasts[1] = castRay(accelerationDirection);
-            previousRaycasts[2] = castRay(accelerationDirection + raycastAngleOffset);
+            castRay(accelerationDirection - raycastAngleOffset, previousRaycasts[0]);
+            castRay(accelerationDirection, previousRaycasts[1]);
+            castRay(accelerationDirection + raycastAngleOffset, previousRaycasts[2]);
 
-            double[] inputs = new double[Brain.inputNodeCount];
-            inputs[0] = velocityX;
-            inputs[1] = velocityY;
-            inputs[2] = accelerationDirection;
-            inputs[3] = accelerationDirectionVelocity;
-            inputs[4] = Math.hypot(previousRaycasts[0][0] - centerX, previousRaycasts[0][1] - centerY) / mapHypot;
-            inputs[5] = Math.hypot(previousRaycasts[1][0] - centerX, previousRaycasts[1][1] - centerY) / mapHypot;
-            inputs[6] = Math.hypot(previousRaycasts[2][0] - centerX, previousRaycasts[2][1] - centerY) / mapHypot;
-            inputs[7] = previousBrainOutput[Brain.outputNodeCount - 1]; // memory
-            inputs[8] = 1; // constant
+            brainInputs[0] = velocityX;
+            brainInputs[1] = velocityY;
+            brainInputs[2] = accelerationDirection;
+            brainInputs[3] = accelerationDirectionVelocity;
+            brainInputs[4] = Math.hypot(previousRaycasts[0][0] - centerX, previousRaycasts[0][1] - centerY) / mapHypot;
+            brainInputs[5] = Math.hypot(previousRaycasts[1][0] - centerX, previousRaycasts[1][1] - centerY) / mapHypot;
+            brainInputs[6] = Math.hypot(previousRaycasts[2][0] - centerX, previousRaycasts[2][1] - centerY) / mapHypot;
+            brainInputs[7] = previousBrainOutput[Brain.outputNodeCount - 1]; // memory
+            brainInputs[8] = 1; // constant
 
             for (int i = 0; i < 4; i++) {   // don't touch anything that's already normalized
-                inputs[i] = Utils.sigmoid(inputs[i]);
+                brainInputs[i] = Utils.sigmoid(brainInputs[i]);
             }
 
-            previousBrainOutput = brain.getOutputs(inputs);
+            brain.getOutputs(brainInputs, previousBrainOutput);
             accelerationDirectionVelocity = previousBrainOutput[0];
         }
     }
-    private double[] castRay (double direction) {
+    private void castRay (double direction, double[] output) {
         double raycastDX = raycastResolution * Math.cos(direction);
         double raycastDY = raycastResolution * Math.sin(direction);
         double raycastX = centerX + raycastDX;
@@ -167,7 +175,8 @@ public class Racer implements Comparable<Racer> {
             raycastX += raycastDX;
             raycastY += raycastDY;
         }
-        return new double[]{raycastX, raycastY};
+        output[0] = raycastX;
+        output[1] = raycastY;
     }
     public void draw (Graphics g) {
         if (!dead) {

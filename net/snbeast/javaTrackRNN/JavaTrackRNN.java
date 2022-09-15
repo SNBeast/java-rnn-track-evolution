@@ -108,7 +108,8 @@ public class JavaTrackRNN extends JPanel implements ActionListener, KeyListener 
             generation.runBrains();
             generation.move();
             if (generation.allDead()) {
-                generation = new Generation(generation, map);
+                generation.evolve();
+                System.gc();
             }
         }
         repaint();
@@ -118,12 +119,9 @@ public class JavaTrackRNN extends JPanel implements ActionListener, KeyListener 
     public void keyTyped (KeyEvent e) {
         if (DEBUG) {
             if (e.getKeyChar() == 'r') {
-                racer = new Racer(new Brain(null), map);
+                racer.initialize(new Brain(null));
                 if (DEBUG_AI) {
-                    brainCanvas.remove(bw);
-                    brainCanvas.revalidate();
-                    bw = new BrainWindow(racer.getBrain());
-                    brainCanvas.add(bw);
+                    bw.setBrain(racer.getBrain());
                 }
             }
         }

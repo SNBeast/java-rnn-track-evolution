@@ -11,6 +11,10 @@ public class BrainWindow extends JPanel {
         setPreferredSize(new Dimension(Brain.panelWidth, Brain.panelHeight));
     }
 
+    public void setBrain (Brain brain) {
+        this.brain = brain;
+    }
+
     @Override
     public void paintComponent (Graphics g) {
         super.paintComponent(g);
